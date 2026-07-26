@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}DISC Questionnaire{% endblock %}</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 40rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+    fieldset { margin-bottom: 1.5rem; padding: 1rem; }
+    label { display: block; padding: 0.75rem 0.5rem; min-height: 44px; }
+    input:focus, button:focus, a:focus { outline: 3px solid #1a5fb4; outline-offset: 2px; }
+    button { min-height: 44px; padding: 0.5rem 1.5rem; font-size: 1rem; }
+    .disclaimer { font-size: 0.875rem; color: #444; border-top: 1px solid #ccc; margin-top: 2rem; padding-top: 1rem; }
+  </style>
+</head>
+<body>
+  {% block content %}{% endblock %}
+</body>
+</html>
