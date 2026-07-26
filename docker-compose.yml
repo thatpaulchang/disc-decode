@@ -1,0 +1,13 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - db-data:/data
+    environment:
+      DB_PATH: /data/disc-decode.db
+
+volumes:
+  db-data:
