@@ -38,12 +38,27 @@ def health() -> dict[str, str]:
 def index(request: Request):
     respondent = get_current_respondent(request)
     if respondent is None:
-        return RedirectResponse("/q/0", status_code=303)
+        return templates.TemplateResponse(request, "landing.html", {})
 
     resume_index = first_unanswered_tetrad(respondent["id"], TOTAL_TETRADS)
     if resume_index is None:
         return RedirectResponse("/results", status_code=303)
     return RedirectResponse(f"/q/{resume_index}", status_code=303)
+
+
+@app.post("/")
+def start_run(request: Request, display_name: str = Form(...)):
+    display_name = display_name.strip()
+    if not display_name:
+        return templates.TemplateResponse(
+            request,
+            "landing.html",
+            {"error": "Please enter a name."},
+            status_code=400,
+        )
+
+    get_or_create_respondent(request, display_name)
+    return RedirectResponse("/q/0", status_code=303)
 
 
 @app.get("/results")

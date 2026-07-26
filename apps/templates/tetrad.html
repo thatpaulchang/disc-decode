@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block title %}Question {{ tetrad_index + 1 }} of {{ total_tetrads }}{% endblock %}
 {% block content %}
-<p>Question {{ tetrad_index + 1 }} of {{ total_tetrads }}</p>
-<h1>Which is most like you? Which is least like you?</h1>
+<h1>Question {{ tetrad_index + 1 }} of {{ total_tetrads }}</h1>
+<p>Pick one <strong>most</strong> like you, one <strong>least</strong> like you.</p>
 
 {% if error %}
 <p role="alert">{{ error }}</p>
@@ -33,7 +33,7 @@
 
   <p>
     {% if tetrad_index > 0 %}
-    <a href="/q/{{ tetrad_index - 1 }}">Back</a>
+    <a class="button" href="/q/{{ tetrad_index - 1 }}">Back</a>
     {% endif %}
     <button type="submit">Next</button>
   </p>
