@@ -5,6 +5,7 @@ See docs/spec.md "Scoring" for the rules this implements.
 """
 
 from dataclasses import dataclass
+from types import MappingProxyType
 
 from apps.logic.items import Style
 
@@ -19,11 +20,11 @@ class Answer:
 
 @dataclass(frozen=True)
 class Score:
-    most: dict[Style, int]
-    least: dict[Style, int]
-    diff: dict[Style, int]
-    top_styles: set[Style]
-    bottom_styles: set[Style]
+    most: MappingProxyType[Style, int]
+    least: MappingProxyType[Style, int]
+    diff: MappingProxyType[Style, int]
+    top_styles: frozenset[Style]
+    bottom_styles: frozenset[Style]
 
 
 def score_answers(answers: list[Answer]) -> Score:
@@ -42,5 +43,9 @@ def score_answers(answers: list[Answer]) -> Score:
     bottom_styles = {style for style, value in diff.items() if value == lowest}
 
     return Score(
-        most=most, least=least, diff=diff, top_styles=top_styles, bottom_styles=bottom_styles
+        most=MappingProxyType(most),
+        least=MappingProxyType(least),
+        diff=MappingProxyType(diff),
+        top_styles=frozenset(top_styles),
+        bottom_styles=frozenset(bottom_styles),
     )

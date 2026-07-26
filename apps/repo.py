@@ -76,7 +76,16 @@ def save_results(respondent_id: int, score: Score) -> None:
                 top_styles, bottom_styles
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON CONFLICT (respondent_id) DO NOTHING
+            ON CONFLICT (respondent_id) DO UPDATE SET
+                most_d = excluded.most_d, most_i = excluded.most_i,
+                most_s = excluded.most_s, most_c = excluded.most_c,
+                least_d = excluded.least_d, least_i = excluded.least_i,
+                least_s = excluded.least_s, least_c = excluded.least_c,
+                diff_d = excluded.diff_d, diff_i = excluded.diff_i,
+                diff_s = excluded.diff_s, diff_c = excluded.diff_c,
+                top_styles = excluded.top_styles,
+                bottom_styles = excluded.bottom_styles,
+                completed_at = datetime('now')
             """,
             (
                 respondent_id,
@@ -111,17 +120,15 @@ def get_results(respondent_id: int) -> sqlite3.Row | None:
         conn.close()
 
 
-def get_or_create_results(respondent_id: int, total_tetrads: int) -> sqlite3.Row:
-    """Fetch stored results, scoring and saving them first if this is the
-    first time this respondent has reached /results.
+def compute_and_save_results(respondent_id: int, total_tetrads: int) -> sqlite3.Row:
+    """Score the respondent's current answers and persist the result.
 
-    Caller must already know all tetrads are answered (i.e.
-    first_unanswered_tetrad returned None) -- this does not check.
+    Always recomputes from the current responses rather than reusing a
+    stored row, so that going back and changing an answer after reaching
+    /results is reflected the next time /results is viewed. Caller must
+    already know all tetrads are answered (i.e. first_unanswered_tetrad
+    returned None) -- this does not check.
     """
-    results = get_results(respondent_id)
-    if results is not None:
-        return results
-
     answers_by_index = get_answers(respondent_id)
     answers = [
         Answer(answers_by_index[i]["most_style"], answers_by_index[i]["least_style"])

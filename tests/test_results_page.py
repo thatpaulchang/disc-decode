@@ -37,15 +37,31 @@ def test_results_page_shows_disclaimer(client):
     assert "not suitable for hiring" in response.text
 
 
-def test_results_are_only_scored_once(client):
-    """Answering, viewing results, then somehow re-triggering scoring
-    should not change the stored results (scoring runs once)."""
+def test_repeat_views_are_stable_when_nothing_changed(client):
     complete_questionnaire(client, HAND_CHECKED_FIXTURE)
 
     first_view = client.get("/results")
     second_view = client.get("/results")
 
     assert first_view.text == second_view.text
+
+
+def test_changing_an_answer_after_viewing_results_updates_the_score(client):
+    """Scoring recomputes from current answers on every /results visit, so
+    going back and changing an answer after already viewing results must be
+    reflected the next time /results is viewed -- not silently stale."""
+    complete_questionnaire(client, HAND_CHECKED_FIXTURE)
+
+    first_view = client.get("/results")
+    assert "Dominance" in first_view.text  # D is the hand-checked top style
+
+    # Go back and heavily favor C instead, changing every tetrad's answer.
+    for index in range(len(HAND_CHECKED_FIXTURE)):
+        answer(client, index, "C", "D")
+
+    second_view = client.get("/results")
+    assert "Conscientiousness" in second_view.text
+    assert first_view.text != second_view.text
 
 
 def test_all_four_tied_renders_without_crashing(client):

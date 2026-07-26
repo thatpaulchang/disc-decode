@@ -11,7 +11,7 @@ from apps.db import init_db
 from apps.logic.items import STYLE_DESCRIPTIONS, STYLE_NAMES, TETRADS
 from apps.logic.scoring import STYLES
 from apps.logic.validation import ValidationError, validate_answer
-from apps.repo import first_unanswered_tetrad, get_answers, get_or_create_results, save_answer
+from apps.repo import compute_and_save_results, first_unanswered_tetrad, get_answers, save_answer
 from apps.session import get_current_respondent, get_or_create_respondent
 
 
@@ -56,7 +56,7 @@ def show_results(request: Request):
     if resume_index is not None:
         return RedirectResponse(f"/q/{resume_index}", status_code=303)
 
-    results = get_or_create_results(respondent["id"], TOTAL_TETRADS)
+    results = compute_and_save_results(respondent["id"], TOTAL_TETRADS)
 
     return templates.TemplateResponse(
         request,
