@@ -8,9 +8,10 @@ from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 
 from apps.db import init_db
-from apps.logic.items import TETRADS
+from apps.logic.items import STYLE_DESCRIPTIONS, STYLE_NAMES, TETRADS
+from apps.logic.scoring import STYLES
 from apps.logic.validation import ValidationError, validate_answer
-from apps.repo import first_unanswered_tetrad, get_answers, save_answer
+from apps.repo import first_unanswered_tetrad, get_answers, get_or_create_results, save_answer
 from apps.session import get_current_respondent, get_or_create_respondent
 
 
@@ -55,8 +56,19 @@ def show_results(request: Request):
     if resume_index is not None:
         return RedirectResponse(f"/q/{resume_index}", status_code=303)
 
-    # Scoring and the real results template land in Phase 2 (issue #2).
-    return templates.TemplateResponse(request, "results_placeholder.html", {})
+    results = get_or_create_results(respondent["id"], TOTAL_TETRADS)
+
+    return templates.TemplateResponse(
+        request,
+        "results.html",
+        {
+            "diff": {style: results[f"diff_{style.lower()}"] for style in STYLES},
+            "top_styles": results["top_styles"].split(","),
+            "bottom_styles": results["bottom_styles"].split(","),
+            "style_names": STYLE_NAMES,
+            "style_descriptions": STYLE_DESCRIPTIONS,
+        },
+    )
 
 
 @app.get("/q/{tetrad_index}")
