@@ -37,6 +37,17 @@
 <p>{{ style_descriptions[style] }}</p>
 {% endfor %}
 
+<h2>Change your answers</h2>
+<p><a class="button" href="/q/0">Review or change an answer</a></p>
+
+<details>
+  <summary>Retake from scratch</summary>
+  <p>This deletes all 24 of your current answers and starts you over at question 1.</p>
+  <form method="post" action="/retake">
+    <button type="submit">Yes, delete my answers and retake</button>
+  </form>
+</details>
+
 <p class="disclaimer">
   This is an unvalidated, for-entertainment questionnaire inspired by the
   public-domain DISC model first described by William Moulton Marston in
