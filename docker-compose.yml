@@ -8,6 +8,7 @@ services:
       - db-data:/data
     environment:
       DB_PATH: /data/disc-decode.db
+      SESSION_SECRET: ${SESSION_SECRET:-dev-only-insecure-secret-change-for-prod}
 
 volumes:
   db-data:
