@@ -69,10 +69,13 @@ Reject, with a clear message and no database write:
 |---|---|
 | `/` | Explains what this is, carries the disclaimer, takes a display name, starts a run |
 | `/q/<index>` | One tetrad. Radio buttons for most and least. Back and next. |
-| `/results` | The four diff scores, top and bottom styles, style descriptions, ipsative note, disclaimer |
+| `/results` | The four diff scores, top and bottom styles, style descriptions, ipsative note, disclaimer. Also links to review/change an answer, and to retake from scratch. |
+| `POST /retake` | Deletes the respondent's answers and results (same session/token), then sends them to `/q/0` to start over |
 | `/health` | Returns `{"status": "ok"}` for the container |
 
 Resume rule: starting or returning sends the respondent to the **first unanswered tetrad**. If all 24 are answered, to `/results`.
+
+Reviewing after completion: a respondent who has finished can still open any `/q/<index>` to see or change that answer — scoring recomputes from current answers on every `/results` visit, so an edit is reflected the next time results are viewed. Advancing past a reviewed question goes to the next question in order (or `/results` after the last one), not back to "first unanswered" — there isn't one once everything's answered.
 
 ## Cases to handle and test
 
@@ -83,6 +86,8 @@ Resume rule: starting or returning sends the respondent to the **first unanswere
 5. `/results` before finishing → redirect to the first unanswered tetrad.
 6. All four styles tied → both sets hold all four, results page renders, nothing crashes.
 7. No session cookie → treated as a new visitor, not an error.
+8. Reviewing an early question after finishing, then clicking Next → goes to the next question in order, not straight to `/results`.
+9. Retake after finishing → answers and results are cleared, respondent restarts at question 1 with the same session.
 
 ## Tests that matter
 

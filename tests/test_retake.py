@@ -72,3 +72,32 @@ def test_retake_with_no_session_redirects_to_start(client):
     response = client.post("/retake", follow_redirects=False)
     assert response.status_code == 303
     assert response.headers["location"] == "/q/0"
+
+
+def test_reviewing_question_one_and_clicking_next_goes_to_question_two(client):
+    """Regression test: after finishing the questionnaire, reviewing an
+    early answer and clicking Next used to jump straight to /results
+    instead of the next question, because the "where to go next" logic
+    only knew "first unanswered tetrad" -- and there isn't one once
+    everything's done."""
+    complete_questionnaire(client, HAND_CHECKED_FIXTURE)
+
+    client.get("/q/0")
+    response = answer(
+        client, 0, HAND_CHECKED_FIXTURE[0].most_style, HAND_CHECKED_FIXTURE[0].least_style
+    )
+
+    assert response.status_code == 303
+    assert response.headers["location"] == "/q/1"
+
+
+def test_reviewing_the_last_question_and_clicking_next_goes_to_results(client):
+    complete_questionnaire(client, HAND_CHECKED_FIXTURE)
+
+    last_index = len(HAND_CHECKED_FIXTURE) - 1
+    client.get(f"/q/{last_index}")
+    last_answer = HAND_CHECKED_FIXTURE[last_index]
+    response = answer(client, last_index, last_answer.most_style, last_answer.least_style)
+
+    assert response.status_code == 303
+    assert response.headers["location"] == "/results"

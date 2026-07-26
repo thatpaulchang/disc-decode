@@ -172,7 +172,19 @@ def submit_tetrad(
             status_code=400,
         )
 
+    was_reviewing_completed_run = resume_index is None
     save_answer(respondent["id"], tetrad_index, most_style, least_style)
+
+    if was_reviewing_completed_run:
+        # Editing an answer after already finishing: step to the next
+        # tetrad in order (or /results after the last one), not back to
+        # "first unanswered" -- there isn't one, so that would always
+        # short-circuit straight to /results regardless of which
+        # question was being reviewed.
+        next_index = tetrad_index + 1
+        if next_index >= TOTAL_TETRADS:
+            return RedirectResponse("/results", status_code=303)
+        return RedirectResponse(f"/q/{next_index}", status_code=303)
 
     next_index = first_unanswered_tetrad(respondent["id"], TOTAL_TETRADS)
     if next_index is None:
