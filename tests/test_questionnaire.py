@@ -61,6 +61,23 @@ def test_out_of_range_tetrad_index_is_a_clean_error(client):
     assert response.status_code == 404
 
 
+def test_posting_out_of_range_tetrad_index_is_a_clean_error(client):
+    client.get("/q/0")
+    response = answer(client, 50, "D", "I")
+    assert response.status_code == 404
+
+
+def test_posting_ahead_of_resume_point_does_not_write(client):
+    client.get("/q/0")
+    response = answer(client, 10, "D", "I")
+    # Rejected back to the true resume point, not accepted out of order.
+    assert response.status_code == 303
+    assert response.headers["location"] == "/q/0"
+
+    resume = client.get("/", follow_redirects=False)
+    assert resume.headers["location"] == "/q/0"
+
+
 def test_results_before_finishing_redirects_to_first_unanswered(client):
     client.get("/q/0")
     answer(client, 0, "D", "I")

@@ -96,9 +96,20 @@ def submit_tetrad(
     most_style: str = Form(...),
     least_style: str = Form(...),
 ):
+    if not (0 <= tetrad_index < TOTAL_TETRADS):
+        return templates.TemplateResponse(
+            request, "error.html", {"message": "That question doesn't exist."}, status_code=404
+        )
+
     respondent = get_current_respondent(request)
     if respondent is None:
         return RedirectResponse(f"/q/{tetrad_index}", status_code=303)
+
+    # Match GET /q/<index>: never let a submission jump ahead of the
+    # respondent's true resume point (e.g. POST /q/23 right after /q/0).
+    resume_index = first_unanswered_tetrad(respondent["id"], TOTAL_TETRADS)
+    if resume_index is not None and tetrad_index > resume_index:
+        return RedirectResponse(f"/q/{resume_index}", status_code=303)
 
     try:
         validate_answer(tetrad_index, TOTAL_TETRADS, most_style, least_style)
