@@ -22,6 +22,16 @@ def test_returning_visitor_is_redirected_to_resume_point(client):
     assert response.headers["location"] == "/q/0"
 
 
+def test_returning_visitor_who_finished_is_redirected_to_results(client):
+    client.get("/q/0")
+    for i in range(len(TETRADS)):
+        answer(client, i, "D", "I")
+
+    response = client.get("/", follow_redirects=False)
+    assert response.status_code == 303
+    assert response.headers["location"] == "/results"
+
+
 def test_answering_a_tetrad_advances_to_the_next_one(client):
     client.get("/q/0")
     response = answer(client, 0, "D", "I")

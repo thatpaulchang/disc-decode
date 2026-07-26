@@ -6,9 +6,9 @@ This is an unvalidated, for-entertainment questionnaire inspired by the public-d
 
 ## Running it
 
-Everything runs in Docker. You need Docker installed; nothing else.
+Everything runs in Docker. You need Docker and GNU Make installed; nothing else.
 
-```
+```shell
 cp .env.example .env   # first time only
 make up                 # build and start the app at http://localhost:8000
 ```
