@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}DISC Questionnaire{% endblock %}
+{% block content %}
+<h1>DISC Questionnaire</h1>
+
+<p>
+  This is a 24-question forced-choice questionnaire. For each set of four
+  statements, you'll pick the one that's <strong>most</strong> like you and
+  the one that's <strong>least</strong> like you. It takes about 10 minutes.
+  Your answers save as you go, so you can close this and come back later.
+</p>
+
+{% if error %}
+<p role="alert">{{ error }}</p>
+{% endif %}
+
+<form method="post" action="/">
+  <label for="display_name">What should we call you?</label>
+  <input type="text" id="display_name" name="display_name" required
+    autocomplete="name" placeholder="e.g. Alex">
+  <p><button type="submit">Start</button></p>
+</form>
+
+<p class="disclaimer">
+  This is an unvalidated, for-entertainment questionnaire inspired by the
+  public-domain DISC model first described by William Moulton Marston in
+  <em>Emotions of Normal People</em> (1928). It has no validity evidence
+  behind it and is not suitable for hiring, promotion, or performance
+  decisions. Scores are ipsative &mdash; they rank your four styles against
+  each other, not against other people. All questionnaire text is original
+  to this project. "DiSC&reg;" and "Everything DiSC&reg;" are registered
+  trademarks of John Wiley &amp; Sons, Inc., which has no connection to this
+  project.
+</p>
+{% endblock %}

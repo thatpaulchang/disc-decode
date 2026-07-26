@@ -9,10 +9,27 @@ def answer(client, index, most, least):
     )
 
 
-def test_first_visit_redirects_to_first_tetrad(client):
+def test_first_visit_shows_landing_page(client):
+    response = client.get("/", follow_redirects=False)
+    assert response.status_code == 200
+    assert "DISC" in response.text
+
+
+def test_returning_visitor_is_redirected_to_resume_point(client):
+    client.get("/q/0")  # establishes a session
     response = client.get("/", follow_redirects=False)
     assert response.status_code == 303
     assert response.headers["location"] == "/q/0"
+
+
+def test_returning_visitor_who_finished_is_redirected_to_results(client):
+    client.get("/q/0")
+    for i in range(len(TETRADS)):
+        answer(client, i, "D", "I")
+
+    response = client.get("/", follow_redirects=False)
+    assert response.status_code == 303
+    assert response.headers["location"] == "/results"
 
 
 def test_answering_a_tetrad_advances_to_the_next_one(client):
