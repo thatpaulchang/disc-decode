@@ -120,6 +120,19 @@ def get_results(respondent_id: int) -> sqlite3.Row | None:
         conn.close()
 
 
+def reset_respondent(respondent_id: int) -> None:
+    """Delete this respondent's answers and results so they can retake the
+    questionnaire from scratch. The respondent row (and its session token)
+    is kept as-is."""
+    conn = get_connection()
+    try:
+        conn.execute("DELETE FROM responses WHERE respondent_id = ?", (respondent_id,))
+        conn.execute("DELETE FROM results WHERE respondent_id = ?", (respondent_id,))
+        conn.commit()
+    finally:
+        conn.close()
+
+
 def compute_and_save_results(respondent_id: int, total_tetrads: int) -> sqlite3.Row:
     """Score the respondent's current answers and persist the result.
 

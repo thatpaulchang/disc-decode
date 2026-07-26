@@ -11,7 +11,13 @@ from apps.db import init_db
 from apps.logic.items import STYLE_DESCRIPTIONS, STYLE_NAMES, TETRADS
 from apps.logic.scoring import STYLES
 from apps.logic.validation import ValidationError, validate_answer
-from apps.repo import compute_and_save_results, first_unanswered_tetrad, get_answers, save_answer
+from apps.repo import (
+    compute_and_save_results,
+    first_unanswered_tetrad,
+    get_answers,
+    reset_respondent,
+    save_answer,
+)
 from apps.session import get_current_respondent, get_or_create_respondent
 
 
@@ -86,6 +92,16 @@ def show_results(request: Request):
     )
 
 
+@app.post("/retake")
+def retake(request: Request):
+    respondent = get_current_respondent(request)
+    if respondent is None:
+        return RedirectResponse("/q/0", status_code=303)
+
+    reset_respondent(respondent["id"])
+    return RedirectResponse("/q/0", status_code=303)
+
+
 @app.get("/q/{tetrad_index}")
 def show_tetrad(request: Request, tetrad_index: int):
     if not (0 <= tetrad_index < TOTAL_TETRADS):
@@ -95,9 +111,10 @@ def show_tetrad(request: Request, tetrad_index: int):
 
     respondent = get_or_create_respondent(request)
     resume_index = first_unanswered_tetrad(respondent["id"], TOTAL_TETRADS)
-    if resume_index is None:
-        return RedirectResponse("/results", status_code=303)
-    if tetrad_index > resume_index:
+    # resume_index is None once every tetrad is answered -- that means there's
+    # no "ahead" to block, so any valid index is fair game to view or edit
+    # (e.g. reviewing an old answer from /results).
+    if resume_index is not None and tetrad_index > resume_index:
         return RedirectResponse(f"/q/{resume_index}", status_code=303)
 
     existing = get_answers(respondent["id"]).get(tetrad_index)
