@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Your results{% endblock %}
+{% block content %}
+<h1>Your DISC profile</h1>
+
+<p>
+  This is <strong>ipsative</strong> scoring: it ranks your four styles
+  against each other, not against other people. There is no "good" or "bad"
+  score here, only which of your own four styles is strongest and which is
+  weakest relative to the others.
+</p>
+
+<h2>Scores</h2>
+<table>
+  <thead>
+    <tr><th scope="col">Style</th><th scope="col">Score</th></tr>
+  </thead>
+  <tbody>
+    {% for style in ["D", "I", "S", "C"] %}
+    <tr>
+      <td>{{ style }} &mdash; {{ style_names[style] }}</td>
+      <td>{{ diff[style] }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h2>Your top style{{ "s" if top_styles|length > 1 else "" }}</h2>
+{% for style in top_styles %}
+<h3>{{ style }} &mdash; {{ style_names[style] }}</h3>
+<p>{{ style_descriptions[style] }}</p>
+{% endfor %}
+
+<h2>Your lowest-scoring style{{ "s" if bottom_styles|length > 1 else "" }}</h2>
+{% for style in bottom_styles %}
+<h3>{{ style }} &mdash; {{ style_names[style] }}</h3>
+<p>{{ style_descriptions[style] }}</p>
+{% endfor %}
+
+<p class="disclaimer">
+  This is an unvalidated, for-entertainment questionnaire inspired by the
+  public-domain DISC model first described by William Moulton Marston in
+  <em>Emotions of Normal People</em> (1928). It has no validity evidence
+  behind it and is not suitable for hiring, promotion, or performance
+  decisions. Scores are ipsative &mdash; they rank your four styles against
+  each other, not against other people. All questionnaire text is original
+  to this project. "DiSC&reg;" and "Everything DiSC&reg;" are registered
+  trademarks of John Wiley &amp; Sons, Inc., which has no connection to this
+  project.
+</p>
+{% endblock %}
